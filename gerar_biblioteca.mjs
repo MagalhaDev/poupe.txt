@@ -120,39 +120,68 @@ function parseYaml(yamlBlock) {
   return metadata;
 }
 
+function createDocxTable(rows) {
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: rows.map((row, i) => new TableRow({
+      children: row.map(cell => new TableCell({
+        children: [new Paragraph({
+          children: [new TextRun({ text: cell, size: 18, color: i === 0 ? COLORS.white : COLORS.darkText, bold: i === 0, font: 'Arial' })],
+          alignment: AlignmentType.CENTER,
+        })],
+        shading: i === 0 ? { fill: COLORS.primary, type: ShadingType.CLEAR } : undefined,
+        verticalAlign: AlignmentType.CENTER,
+        margins: { top: 100, bottom: 100, left: 100, right: 100 },
+      })),
+    })),
+  });
+}
+
 async function convertMdToDocx(mdContent, metadata, outputPath) {
   const lines = mdContent.split('\n');
   const children = [];
-  let currentTable = null;
+  let tableRows = [];
 
   for (let line of lines) {
-    line = line.trim();
-    if (!line) continue;
+    const trimmedLine = line.trim();
+    
+    // Processamento de tabelas (agrupamento de linhas consecutivas com '|')
+    if (trimmedLine.startsWith('|')) {
+      if (trimmedLine.includes('---')) continue;
+      const cells = trimmedLine.split('|').filter((c, idx, arr) => {
+          if (idx === 0 || idx === arr.length - 1) return c.trim() !== '';
+          return true;
+      }).map(c => c.trim());
+      if (cells.length > 0) tableRows.push(cells);
+      continue;
+    } else if (tableRows.length > 0) {
+      children.push(createDocxTable(tableRows));
+      tableRows = [];
+    }
 
-    if (line.startsWith('# ')) {
-      children.push(titlePara(line.substring(2)));
-    } else if (line.startsWith('## ')) {
-      children.push(subtitlePara(line.substring(3)));
-    } else if (line.startsWith('**') && line.includes(':**')) {
-      const parts = line.split(':**');
+    if (!trimmedLine) continue;
+
+    if (trimmedLine.startsWith('# ')) {
+      children.push(titlePara(trimmedLine.substring(2)));
+    } else if (trimmedLine.startsWith('## ')) {
+      children.push(subtitlePara(trimmedLine.substring(3)));
+    } else if (trimmedLine.startsWith('**') && trimmedLine.includes(':**')) {
+      const parts = trimmedLine.split(':**');
       const label = parts[0].replace(/\*\*/g, '').trim();
       const value = parts[1].trim();
       children.push(fieldPara(label, value));
-    } else if (line.startsWith('- ') || line.startsWith('* ')) {
-      children.push(bulletPara(line.substring(2)));
-    } else if (line.startsWith('|')) {
-      // Processamento básico de tabela
-      if (line.includes('---')) continue; 
-      const cells = line.split('|').filter(c => c.trim()).map(c => c.trim());
-      if (cells.length > 0) {
-        // Docx table logic can be complex, for now we list as body with styling
-        children.push(bodyPara(cells.join('  |  '), { bold: true, color: COLORS.primary }));
-      }
-    } else if (line.startsWith('____')) {
+    } else if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('* ')) {
+      children.push(bulletPara(trimmedLine.substring(2)));
+    } else if (trimmedLine.startsWith('____')) {
       children.push(...signaturePara('[Assinatura]'));
     } else {
-      children.push(bodyPara(line));
+      children.push(bodyPara(trimmedLine));
     }
+  }
+  
+  // Caso o arquivo termine com uma tabela
+  if (tableRows.length > 0) {
+    children.push(createDocxTable(tableRows));
   }
 
   const doc = new Document({
