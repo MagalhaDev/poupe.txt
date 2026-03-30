@@ -1,0 +1,280 @@
+# POUPE.TXT — Central de Templates de Produtividade
+
+App desktop (macOS + Windows) com biblioteca de templates prontos para uso. Foco: **velocidade + praticidade + execução**.
+
+---
+
+## User Review Required
+
+> [!IMPORTANT]
+> **Decisões que preciso confirmar antes de codar:**
+> 1. **Electron** como framework desktop — é a escolha mais rápida para MVP com Node.js. OK?
+> 2. **50 templates iniciais** gerados por IA (expandível depois). Quantidade OK?
+> 3. **Exportação .txt e .pdf** no MVP. `.docx` fica para v2?
+> 4. **Sem login/auth** no MVP — tudo local. OK?
+
+---
+
+## Proposed Changes
+
+### Arquitetura Geral
+
+```
+POUPE.TXT/
+├── package.json
+├── main.js                    # Electron main process
+├── preload.js                 # Bridge segura main↔renderer
+├── src/
+│   ├── index.html             # Shell do app
+│   ├── css/
+│   │   └── style.css          # Design system completo
+│   ├── js/
+│   │   ├── app.js             # Router + controlador principal
+│   │   ├── templates.js       # Engine de templates (CRUD + busca)
+│   │   ├── editor.js          # Editor de texto simples
+│   │   ├── favorites.js       # Sistema de favoritos
+│   │   └── export.js          # Exportação (.txt, .pdf)
+│   └── pages/
+│       ├── home.js            # Tela inicial
+│       ├── category.js        # Listagem por categoria
+│       ├── preview.js         # Visualização do template
+│       └── editor-page.js     # Tela de edição
+├── data/
+│   └── templates.json         # Banco de 50+ templates
+├── assets/
+│   └── icons/                 # Ícones do app
+└── electron-builder.yml       # Config de build/distribuição
+```
+
+---
+
+### Componente 1: Electron Shell
+
+#### [NEW] main.js
+- Cria janela principal (1200x800, min 900x600)
+- Menu nativo simplificado
+- Atalhos de teclado (Cmd+N, Cmd+S, Cmd+F)
+
+#### [NEW] preload.js
+- Bridge segura para exportar arquivos (salvar no disco)
+- API para ler/gravar favoritos no localStorage
+
+---
+
+### Componente 2: Design System
+
+#### [NEW] src/css/style.css
+- **Tema dark** como padrão (profissional, moderno)
+- Paleta: fundo `#0f0f0f`, cards `#1a1a1a`, accent `#6c5ce7` (roxo)
+- Tipografia: **Inter** (Google Fonts)
+- Sidebar fixa (240px) + conteúdo principal
+- Cards com hover animation (scale + glow sutil)
+- Transições suaves (200ms ease)
+- Responsivo (sidebar colapsa em tela menor)
+- Scrollbar customizada
+
+---
+
+### Componente 3: Tela Inicial (Home)
+
+#### [NEW] src/pages/home.js
+
+```
+┌──────────────────────────────────────────────┐
+│  [sidebar]           │  POUPE.TXT            │
+│                      │                        │
+│  🏠 Home             │  🔍 [busca...]         │
+│  📄 Docs             │                        │
+│  📊 Planilhas        │  ⭐ Templates Populares │
+│  📢 Marketing        │  ┌────┐ ┌────┐ ┌────┐ │
+│  👤 Pessoal          │  │card│ │card│ │card│  │
+│  ─────────────       │  └────┘ └────┘ └────┘ │
+│  ⭐ Favoritos         │                        │
+│                      │  🕐 Recentes            │
+│                      │  ┌────┐ ┌────┐ ┌────┐ │
+│                      │  │card│ │card│ │card│  │
+│                      │  └────┘ └────┘ └────┘ │
+└──────────────────────────────────────────────┘
+```
+
+- Barra de busca com filtro em tempo real (fuzzy search)
+- Seção "Populares" (templates mais usados)
+- Seção "Recentes" (últimos 10 acessados)
+- Grid responsivo de cards
+
+---
+
+### Componente 4: Sistema de Categorias
+
+#### [NEW] src/pages/category.js
+
+| Categoria | Subcategorias |
+|-----------|--------------|
+| **📄 Docs** | Copy, VSL, Proposta, Roteiro, Página de Vendas |
+| **📊 Planilhas** | Finanças, Organização, Metas |
+| **📢 Marketing** | Anúncios, Funil, Conteúdo |
+| **👤 Pessoal** | Rotina, Hábitos, Alimentação |
+
+- Sidebar com navegação por categoria
+- Contador de templates por categoria
+- Subcategorias como tags/filtros
+
+---
+
+### Componente 5: Preview de Template
+
+#### [NEW] src/pages/preview.js
+- Renderiza template em modo leitura
+- Header com nome + categoria + descrição
+- 3 botões de ação:
+  - **✏️ Editar** → abre no editor
+  - **📋 Duplicar** → cria cópia editável
+  - **⬇️ Baixar** → exporta .txt ou .pdf
+- Voltar para listagem
+
+---
+
+### Componente 6: Editor Simples
+
+#### [NEW] src/js/editor.js + src/pages/editor-page.js
+- **ContentEditable** com formatação básica (sem dependência pesada)
+- Toolbar mínima: **Negrito**, *Itálico*, Heading, Lista, Separador
+- Auto-save no localStorage a cada 2 segundos
+- Botão "Salvar" + "Exportar"
+- Estilo Notion-like (foco no conteúdo, UI mínima)
+
+---
+
+### Componente 7: Exportação
+
+#### [NEW] src/js/export.js
+- **`.txt`** — texto puro, sempre disponível
+- **`.pdf`** — via `window.print()` com CSS de impressão (zero dependência)
+- Salvar via dialog nativo do Electron (`dialog.showSaveDialog`)
+
+---
+
+### Componente 8: Banco de Templates
+
+#### [NEW] data/templates.json
+- **50 templates iniciais**, distribuídos:
+
+| Categoria | Qtd | Exemplos |
+|-----------|-----|----------|
+| Docs / Copy | 8 | Headline frameworks, AIDA, PAS, email de vendas |
+| Docs / VSL | 5 | Roteiro VSL curto, VSL completo, gancho de abertura |
+| Docs / Proposta | 5 | Proposta comercial, proposta freelancer, orçamento |
+| Docs / Roteiro | 5 | Roteiro YouTube, roteiro Reels, roteiro podcast |
+| Planilhas / Finanças | 5 | Controle mensal, fluxo de caixa, divisão de gastos |
+| Planilhas / Organização | 4 | Planejamento semanal, kanban pessoal, GTD |
+| Planilhas / Metas | 3 | OKRs pessoais, metas trimestrais, tracker de hábitos |
+| Marketing / Anúncios | 5 | Copy Meta Ads, copy Google Ads, headline hooks |
+| Marketing / Funil | 4 | Funil de vendas, sequência de emails, landing page |
+| Marketing / Conteúdo | 3 | Calendário editorial, ideias de posts, script carrossel |
+| Pessoal / Rotina | 3 | Morning routine, checklist diário, planning semanal |
+
+- Cada template é um objeto JSON:
+```json
+{
+  "id": "vsl-roteiro-completo",
+  "name": "Roteiro de VSL Completo",
+  "category": "docs",
+  "subcategory": "vsl",
+  "description": "Estrutura completa para Video Sales Letter com gancho, problema, solução e CTA",
+  "tags": ["vendas", "video", "conversão"],
+  "popularity": 95,
+  "content": "# Roteiro VSL\n\n## 1. GANCHO (0-30s)\n..."
+}
+```
+
+---
+
+### Componente 9: Favoritos
+
+#### [NEW] src/js/favorites.js
+- Salva IDs no localStorage
+- Toggle ⭐ em qualquer card ou preview
+- Página "Favoritos" na sidebar
+
+---
+
+### Componente 10: Build & Distribuição
+
+#### [NEW] electron-builder.yml
+- Build para **macOS** (.dmg) e **Windows** (.exe)
+- Auto-updater preparado (para v2)
+- Ícone customizado do app
+
+```yaml
+appId: com.poupetxt.app
+productName: POUPE.TXT
+directories:
+  output: dist
+mac:
+  target: dmg
+  category: public.app-category.productivity
+win:
+  target: nsis
+```
+
+---
+
+## Stack Final
+
+| Camada | Tecnologia | Por quê |
+|--------|-----------|---------|
+| **Desktop** | Electron | Cross-platform, maduro, rápido de montar |
+| **Frontend** | HTML + CSS + Vanilla JS | Zero build step, máxima simplicidade |
+| **Editor** | ContentEditable nativo | Sem dependência, suficiente pro MVP |
+| **Dados** | JSON local + localStorage | Sem backend, sem banco de dados |
+| **Exportação** | Text API + window.print() | .txt e .pdf sem libs externas |
+| **Build** | electron-builder | .dmg (Mac) + .exe (Win) em 1 comando |
+| **Tipografia** | Inter (Google Fonts) | Moderna, legível, profissional |
+| **Gráficos** | CSS puro | Sem Chart.js — não há gráficos no MVP |
+
+---
+
+## Cronograma
+
+| Sprint | Tempo | Entregáveis |
+|--------|-------|-------------|
+| **1** | 2h | Electron shell + design system CSS + sidebar + layout |
+| **2** | 2h | Home page + busca + sistema de categorias |
+| **3** | 2h | Preview + editor simples + favoritos |
+| **4** | 1h | Exportação (.txt + .pdf) |
+| **5** | 3h | Gerar 50 templates com IA (Ollama local) |
+| **6** | 1h | Build .dmg + .exe + testes finais |
+| **Total** | **~11h** | **App funcional empacotado** |
+
+---
+
+## Verification Plan
+
+### Automated Tests
+- `npm start` — app abre sem erros
+- Navegar todas as categorias
+- Abrir preview de cada template
+- Editar e salvar
+- Exportar .txt e .pdf
+- Favoritar/desfavoritar
+- Busca retorna resultados corretos
+
+### Build Verification
+- `npm run build:mac` → gera .dmg funcional
+- `npm run build:win` → gera .exe funcional (cross-compile)
+
+### Manual Verification
+- Testar em macOS nativo
+- Verificar performance (< 200MB RAM, < 2s startup)
+- UX: fluxo completo em < 30 segundos (abrir → encontrar → editar → exportar)
+
+---
+
+## Open Questions
+
+> [!WARNING]
+> **Preciso da sua resposta antes de executar:**
+> 1. Confirma Electron como framework? (alternativa seria Tauri — mais leve mas mais complexo de montar)
+> 2. Os 50 templates: quer que eu gere todos com o Ollama que já está rodando na sua máquina?
+> 3. Quer alguma cor/tema diferente? (propus dark com roxo accent)
+> 4. Nome do app no build: "POUPE.TXT" mesmo?
