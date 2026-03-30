@@ -1,0 +1,39 @@
+---
+type: docx
+nicho: Academia
+title: Resumo Acadêmico (Abstract)
+---
+
+# RESUMO ACADÊMICO
+
+**AUTOR:** [NOME COMPLETO DO ALUNO / PESQUISADOR]
+**INSTITUIÇÃO:** [NOME DA INSTITUIÇÃO / CURSO]
+**ORIENTADOR:** [NOME DO ORIENTADOR]
+**DATA DA EMISSÃO:** [DIA] de [MÊS] de [ANO]
+
+## 1. TÍTULO DO TRABALHO
+
+[TÍTULO DO TRABALHO – EX: IMPACTO DA IA NA GESTÃO FINANCEIRA]
+
+## 2. OBJETIVO DA PESQUISA
+
+Esta pesquisa tem como objetivo principal [DESCREVER O OBJETIVO – EX: ANALISAR, IDENTIFICAR, COMPARAR].
+
+## 3. METODOLOGIA
+
+A metodologia utilizada consistiu em [DESCREVER O MÉTODO – EX: PESQUISA BIBLIOGRÁFICA, ESTUDO DE CASO, ANÁLISE QUALITATIVA].
+
+## 4. RESULTADOS E CONCLUSÕES
+
+Os principais resultados obtidos indicam que [DESCREVER OS RESULTADOS – EX: HOUVE UM AUMENTO DE EFICIÊNCIA, A HIPÓTESE FOI CONFIRMADA]. Conclui-se que [DESCREVER A CONCLUSÃO].
+
+## 5. PALAVRAS-CHAVE
+
+- [PALAVRA-CHAVE 1]
+- [PALAVRA-CHAVE 2]
+- [PALAVRA-CHAVE 3]
+
+## 6. REFERÊNCIAS BIBLIOGRÁFICAS (ABNT)
+
+[SOBRENOME, Nome. Título do Livro/Artigo. Local: Editora, Ano.]
+[SOBRENOME, Nome. Título do Livro/Artigo. Local: Editora, Ano.]
